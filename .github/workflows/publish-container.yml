@@ -1,0 +1,23 @@
+name: Publish Bot container image
+
+on:
+  push:
+#    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Verify Server Code
+      run: echo TO DO
+
+    - name: Build Docker image
+      run: docker build . --file Dockerfile --tag guac-pr-bot:$(date +%s) --tag guac-pr-bot:latest
+
+    - name: Publish to Azure Container Registry
+      run: echo TO DO
