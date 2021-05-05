@@ -3,7 +3,6 @@ FROM ruby:2.7-alpine
 WORKDIR /server
 COPY ./Gem* /server/
 COPY ./*.rb /server/
-COPY ./.env /server/
 
 RUN gem install bundler
 RUN bundle install
