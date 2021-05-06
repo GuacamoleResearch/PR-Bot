@@ -31,5 +31,4 @@ jobs:
         docker images
         echo Publishing...
         docker login prbotimages.azurecr.io -u ${{ secrets.CONTAINER_LOGIN }} -p ${{ secrets.CONTAINER_PASSWORD }}
-        docker push prbotimages.azurecr.io/guac-pr-bot:latest
-        docker push prbotimages.azurecr.io/guac-pr-bot:$(date +%s)
+        docker push prbotimages.azurecr.io/guac-pr-bot -a
