@@ -13,20 +13,20 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Verify Server Code
-      run: echo TO DO
-
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag guac-pr-bot:latest --tag prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s) --tag prbotimages.azurecr.io/guac/guac-pr-bot:latest
+      run: docker build . -t guac-pr-bot:latest -t prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s) -t prbotimages.azurecr.io/guac/guac-pr-bot:latest --build-arg PRIVATE_KEY="$PRIVATE_KEY" --build-arg APP_IDENTIFIER="${APP_IDENTIFIER}" --build-arg WEBHOOK_SECRET="${WEBHOOK_SECRET}"
+
+    - name: Container smoke test
+      run: |
+        docker run -p 3000:3000 guac-pr-bot:latest &
+        sleep 2s
+        curl http://localhost:3000/event_handler > /tmp/container_verify.log
+        docker rm -f `docker ps -a --format "{{ .ID }}"` 
+        cat /tmp/container_verify.log
+        grep Healthy /tmp/container_verify.log
 
     - name: Publish to Azure Container Registry
       run: |
         echo Publishing...
-        # docker login prbotimages.azurecr.io -u PrBotImages -p SECRET
-        # docker push prbotimages.azurecr.io/guac/guac-pr-bot:latest
-
-    - name: Verify deployment
-      run: |
-        # curl -w '%{http_code}' http://guac-pr-bot.azurewebsites.net/event_handler | grep 200
-        curl http://guac-pr-bot.azurewebsites.net/event_handler | grep Healthy
-        # This should return a non-zero $? if there wasn't a found
+        docker login prbotimages.azurecr.io -u $CONTAINER_LOGIN -p $CONTAINER_PASSWORD
+        docker push prbotimages.azurecr.io/guac/guac-pr-bot:latest prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s)

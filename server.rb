@@ -42,7 +42,16 @@ class GHAapp < Sinatra::Application
   end
 
   get '/event_handler' do
-    'Healthy'
+    response = "<html><body>
+      Key configured - #{!PRIVATE_KEY.nil?}<br/>
+      Webook configured - #{!WEBHOOK_SECRET.nil?}<br/>
+      Id configured - #{!APP_IDENTIFIER.nil?}<br/>"
+    response += if PRIVATE_KEY.nil? || WEBHOOK_SECRET.nil? || APP_IDENTIFIER.nil?
+                  '<b>BROKEN CONFIGURATION!</b></body>'
+                else
+                  'Healthy</body>'
+                end
+    response
   end
 
   post '/event_handler' do
