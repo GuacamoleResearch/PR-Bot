@@ -18,7 +18,6 @@ jobs:
 
     - name: Container smoke test
       run: |
-        # echo ${{ secrets.PRIVATE_KEY }} | cut -c1-60
         docker run -p 3000:3000 guac-pr-bot:latest &
         sleep 2s
         curl http://localhost:3000/event_handler > /tmp/container_verify.log
