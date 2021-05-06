@@ -17,7 +17,16 @@ jobs:
       run: echo TO DO
 
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag guac-pr-bot:$(date +%s) --tag guac-pr-bot:latest
+      run: docker build . --file Dockerfile --tag guac-pr-bot:latest --tag prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s) --tag prbotimages.azurecr.io/guac/guac-pr-bot:latest
 
     - name: Publish to Azure Container Registry
-      run: echo TO DO
+      run: |
+        echo Publishing...
+        # docker login prbotimages.azurecr.io -u PrBotImages -p SECRET
+        # docker push prbotimages.azurecr.io/guac/guac-pr-bot:latest
+
+    - name: Verify deployment
+      run: |
+        # curl -w '%{http_code}' http://guac-pr-bot.azurewebsites.net/event_handler | grep 200
+        curl http://guac-pr-bot.azurewebsites.net/event_handler | grep Healthy
+        # This should return a non-zero $? if there wasn't a found
