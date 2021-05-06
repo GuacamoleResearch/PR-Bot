@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build Docker image
-      run: docker build . -t guac-pr-bot:latest -t prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s) -t prbotimages.azurecr.io/guac/guac-pr-bot:latest --build-arg PRIVATE_KEY="${{ secrets.PRIVATE_KEY }}" --build-arg APP_IDENTIFIER="${{ secrets.APP_IDENTIFIER }}" --build-arg WEBHOOK_SECRET="${{ secrets.WEBHOOK_SECRET }}"
+      run: docker build . -t guac-pr-bot:latest -t prbotimages.azurecr.io/guac-pr-bot:$(date +%s) -t prbotimages.azurecr.io/guac-pr-bot:latest --build-arg PRIVATE_KEY="${{ secrets.PRIVATE_KEY }}" --build-arg APP_IDENTIFIER="${{ secrets.APP_IDENTIFIER }}" --build-arg WEBHOOK_SECRET="${{ secrets.WEBHOOK_SECRET }}"
 
     - name: Container smoke test
       run: |
@@ -27,7 +27,9 @@ jobs:
 
     - name: Publish to Azure Container Registry
       run: |
+        echo Available images...
+        docker images
         echo Publishing...
         docker login prbotimages.azurecr.io -u ${{ secrets.CONTAINER_LOGIN }} -p ${{ secrets.CONTAINER_PASSWORD }}
-        docker push prbotimages.azurecr.io/guac/guac-pr-bot:latest
-        docker push prbotimages.azurecr.io/guac/guac-pr-bot:$(date +%s)
+        docker push prbotimages.azurecr.io/guac-pr-bot:latest
+        docker push prbotimages.azurecr.io/guac-pr-bot:$(date +%s)
