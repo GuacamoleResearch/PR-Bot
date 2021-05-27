@@ -61,22 +61,25 @@ class GHAapp < Sinatra::Application
   end
 
   helpers do
-    # When an issue is opened, add a label
+    # When an issue is opened, add a comment; for new PRs, self-assign the creator
     def handle_pr_events(payload)
-      action = payload['action']
       repo = payload['repository']['full_name']
       pr_number = payload['pull_request']['number']
       user_login = payload['sender']['login']
 
-      case action
+      case payload['action']
       when 'opened'
-        comment = "Automatically self-assigned PR creator #{user_login}"
-        @installation_client.add_assignees(repo, pr_number, [user_login])
-        @installation_client.add_comment(repo, pr_number, comment)
-        # Reference: https://github.com/octokit/octokit.rb/blob/1aff89cf4dd7de7f7178c17172f5b8211370b7f3/lib/octokit/client/issues.rb#L274
+        handle_pr_opened(user_login, repo, pr_number)
       when 'assigned'
         @installation_client.add_comment(repo, pr_number, 'Welcome to the Pull Request!')
       end
+    end
+
+    def handle_pr_opened(user_login, repo, pr_number)
+      comment = "Automatically self-assigned PR creator #{user_login}"
+      @installation_client.add_assignees(repo, pr_number, [user_login])
+      @installation_client.add_comment(repo, pr_number, comment)
+      # Reference: https://github.com/octokit/octokit.rb/blob/1aff89cf4dd7de7f7178c17172f5b8211370b7f3/lib/octokit/client/issues.rb#L274
     end
 
     # Saves the raw payload and converts the payload to JSON format
